@@ -128,7 +128,15 @@ int main(int argc, char *argv[])
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
 
-    std::cout << "Time elapsed: " << elapsed_seconds.count() << " seconds" << std::endl;
+    int total_seconds = static_cast<int>(elapsed_seconds.count());
+    int hours = total_seconds / 3600;
+    int minutes = (total_seconds % 3600) / 60;
+    int seconds = total_seconds % 60;
+    
+    std::cout << "Time elapsed: " 
+              << hours << "h:"
+              << minutes << "m:"
+              << seconds << "s" << std::endl;
 
     return 0;
 }

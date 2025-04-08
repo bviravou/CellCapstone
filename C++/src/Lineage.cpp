@@ -302,6 +302,7 @@ void Lineage::optimize(int frameIndex)
             // Hill climbing logic
         }
     }
+    Sphere::logCellsToCSV("cell_log.csv", frameIndex, frameIndex, frame.cells);
 }
 
 void Lineage::saveFrame(int frameIndex)

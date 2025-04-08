@@ -1,4 +1,5 @@
 #include "Sphere.hpp"
+#include <fstream>
 #include <random>
 
 SphereParams Sphere::paramClass = SphereParams();
@@ -350,4 +351,24 @@ bool Sphere::checkIfCellsOverlap(const std::vector<Sphere> &spheres)
     }
 
     return overlap;
+}
+
+void Sphere::logCellsToCSV(const std::string& filename, int frameIndex, int iteration, const std::vector<Sphere>& cells) 
+{
+    std::ofstream cellLog(filename, std::ios::app);
+
+    if (cellLog.tellp() == 0) {
+    cellLog << "frame,name,x,y,z,radius,isDormant\n";
+    }
+
+    for (const auto& cell : cells) {
+    cellLog << frameIndex << "," 
+//    << iteration << ","
+    << cell.getName() << ","
+    << cell.getX() << ","
+    << cell.getY() << ","
+    << cell.getZ() << ","
+    << cell.getRadius() << ","
+    << cell.isDormant() << "\n"; // consider removing ?
+    }
 }

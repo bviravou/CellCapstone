@@ -92,6 +92,23 @@ public:
     std::pair<std::vector<float>, std::vector<float>> calculateMinimumBox(Sphere &perturbed_cell) const;
 
     static bool checkIfCellsOverlap(const std::vector<Sphere> &spheres);
+
+    const std::string& getName() const { return _name; }
+
+    float getX() const { return _position.x; }
+    
+    float getY() const { return _position.y; }
+    
+    float getZ() const { return _position.z; }
+    
+    double getRadius() const { return _radius; }
+    
+    bool isDormant() const { return dormant; }
+
+    static void logCellsToCSV(const std::string& filename, 
+        int frameIndex, // frame num
+        int iteration,  // if save ALL interations (accepted and not accepted --> noise)
+        const std::vector<Sphere>& cells);
 };
 
 #endif
