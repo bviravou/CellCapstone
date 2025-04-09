@@ -20,7 +20,8 @@ enum argKeywords {
     input,
     output,
     config,
-    initial
+    initial,
+    track
 };
 
 typedef std::string Path;

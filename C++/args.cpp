@@ -28,6 +28,7 @@ struct Args {
     int continue_from = -1;
     std::optional<int> seed;
     int batches = 1;
+    bool track = false;
 
     void postInit() {
         // Validate arguments

@@ -20,6 +20,7 @@ public:
     std::string initial{};
     std::string output{};
     int continueFrom = -1;
+    bool track = false; // false = generate synthetic cells only + csv, true = track
     // Add other arguments as necessary
 };
 
@@ -101,6 +102,19 @@ int main(int argc, char *argv[])
     std::cout << "Config file: " << args.config << std::endl
               << std::flush;
     args.continueFrom = -1;
+    args.track = std::stoi(argv[track]); 
+    std::cout << "Mode: ";
+    
+    if (std::tolower(args.track) == '0'){
+        // maybe bool track = false;
+        std::cout << "Generate Synthetic Cells Only" << std::endl 
+        << std::flush;
+    }
+    else {
+        // maybe bool track = true;
+        std::cout << "Track cells" << std::endl 
+        << std::flush;
+    }
 
     // load config here
     BaseConfig config;
@@ -112,22 +126,38 @@ int main(int argc, char *argv[])
     // load cells here
     CellFactory cellFactory(config);
     std::map<Path, std::vector<Sphere>> cells = cellFactory.createCells(args.initial, config.simulation.z_slices / 2,
-                                                                        config.simulation.z_scaling);
+                                                                        config.simulation.z_scaling);                                                           
     // create lineage here
     Lineage lineage = Lineage(cells, imageFilePaths, config, args.output, args.continueFrom);
 
     // Run
+
+    // if args.track == 0 then kafnckzkcnszcns
+    // if args.track == 1 then ...
+    
     auto start = std::chrono::steady_clock::now();
-    for (int frame = 0; frame < lineage.length(); ++frame)
-    {
-        lineage.optimize(frame);
-        lineage.copyCellsForward(frame + 1);
-        lineage.saveFrame(frame);
-        // lineage.saveCells(frame); // TODO: Fix this
+
+    if (args.track == 0){
+        auto start = std::chrono::steady_clock::now();
+        std::cout << "Generate Synthetic Cells Only" << std::endl 
+        << std::flush;
+        // either pertrub or edit optimize function
     }
+    else{
+        auto start = std::chrono::steady_clock::now();
+        for (int frame = 0; frame < lineage.length(); ++frame)
+        {
+            lineage.optimize(frame);
+            lineage.copyCellsForward(frame + 1);
+            lineage.saveFrame(frame);
+            // lineage.saveCells(frame); // TODO: Fix this
+        }
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+    }
+
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-
     int total_seconds = static_cast<int>(elapsed_seconds.count());
     int hours = total_seconds / 3600;
     int minutes = (total_seconds % 3600) / 60;

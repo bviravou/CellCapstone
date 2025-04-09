@@ -230,8 +230,8 @@ void Lineage::optimize(int frameIndex)
 
     double tolerance = 0.5;
     bool minimaReached = false;
-   // Cost curCost = 0;
- //   Cost newCost = 0;
+    // Cost curCost = 0;
+    // Cost newCost = 0;
     Cost costDiff = 0;
     double residSum = 0;
     double residCount = 0;
