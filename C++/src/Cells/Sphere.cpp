@@ -54,14 +54,23 @@ void Sphere::drawOutline(cv::Mat &image, float color, float z) const
 
 Sphere Sphere::getPerturbedCell(bool track) const
 {
+    float newRadius;
+    if (!track) {
+        // Constrain radius only in synthetic mode (track=0)
+        newRadius = std::max(cellConfig.minRadius,
+                           std::min(_radius + cellConfig.radius.getPerturbOffset(track),
+                                  cellConfig.maxRadius));
+    } else {
+        // Original behavior for track=1
+        newRadius = _radius + cellConfig.radius.getPerturbOffset(track);
+    }
+
     SphereParams sphereParams(
         _name,
-
-        // FIXME: we should choose only ONE of these, uniformly at random, to perturb in each iteration.
         _position.x + cellConfig.x.getPerturbOffset(track),
         _position.y + cellConfig.y.getPerturbOffset(track),
         _position.z + cellConfig.z.getPerturbOffset(track),
-        _radius + cellConfig.radius.getPerturbOffset(track));
+        newRadius);
     return Sphere(sphereParams);
 }
 
