@@ -52,16 +52,16 @@ void Sphere::drawOutline(cv::Mat &image, float color, float z) const
     cv::circle(image, center, static_cast<int>(round(currentRadius)), cv::Scalar(outlineColor), thickness, cv::LINE_AA);
 }
 
-Sphere Sphere::getPerturbedCell() const
+Sphere Sphere::getPerturbedCell(bool track) const
 {
     SphereParams sphereParams(
         _name,
 
         // FIXME: we should choose only ONE of these, uniformly at random, to perturb in each iteration.
-        _position.x + cellConfig.x.getPerturbOffset(),
-        _position.y + cellConfig.y.getPerturbOffset(),
-        _position.z + cellConfig.z.getPerturbOffset(),
-        _radius + cellConfig.radius.getPerturbOffset());
+        _position.x + cellConfig.x.getPerturbOffset(track),
+        _position.y + cellConfig.y.getPerturbOffset(track),
+        _position.z + cellConfig.z.getPerturbOffset(track),
+        _radius + cellConfig.radius.getPerturbOffset(track));
     return Sphere(sphereParams);
 }
 

@@ -67,7 +67,7 @@ public:
 
     void drawOutline(cv::Mat &image, float color, float z = 0) const;
 
-    [[nodiscard]] Sphere getPerturbedCell() const;
+    [[nodiscard]] Sphere getPerturbedCell(bool track = false) const;
 
     Sphere getParameterizedCell(std::unordered_map<std::string, float> params) const;
 

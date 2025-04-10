@@ -79,21 +79,29 @@ public:
     float prob;
     float mu;
     float sigma;
+    //static const float SCALING_FACTOR = 1.5;
     void explodeParams(const YAML::Node& node) {
         prob = node["prob"].as<float>();
         mu = node["mu"].as<float>();
         sigma = node["sigma"].as<float>();
     }
-    [[nodiscard]] float getPerturbOffset() const {
-        std::random_device rd; // Obtain a random number from hardware
-        std::mt19937 gen(rd()); // Seed the generator
-        std::uniform_real_distribution<> dis(0.0, 1.0); // Distribution for probability
+    
+    [[nodiscard]] float getPerturbOffset(bool track = true) const {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(0.0, 1.0);
 
-        if (dis(gen) < prob) {
-            std::normal_distribution<> d(mu, sigma); // Distribution for the Gaussian
-            return d(gen);
+        if (!track) {
+            std::normal_distribution<> d(mu, sigma);
+            return d(gen) * 1.5;
         } else {
-            return mu;
+            // "normal" perturbation amount
+            if (dis(gen) < prob) {
+                std::normal_distribution<> d(mu, sigma);
+                return d(gen);
+            } else {
+                return mu;
+            }
         }
     }
 };

@@ -216,7 +216,7 @@ Lineage::Lineage(std::map<std::string, std::vector<Sphere>> initialCells, PathVe
         }
     }
 }
-void Lineage::optimize(int frameIndex)
+void Lineage::optimize(int frameIndex, bool track)
 {
     if (frameIndex < 0 || static_cast<size_t>(frameIndex) >= frames.size())
     {
@@ -224,6 +224,36 @@ void Lineage::optimize(int frameIndex)
     }
 
     Frame &frame = frames[frameIndex];
+    
+    if (!track) {
+        // For synthetic cell generation, only perturb once and log to CSV
+        size_t totalIterations = frame.length() * 1; // Only perturb each cell once
+        std::cout << "Generating synthetic cells, iterations: " << totalIterations << std::endl;
+        
+        for (size_t i = 0; i < totalIterations; ++i) {
+            std::vector<std::string> options = {"split", "perturbation"};
+            std::vector<double> probabilities = {config.prob.split, config.prob.perturbation};
+            
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::discrete_distribution<> dist(probabilities.begin(), probabilities.end());
+            
+            int chosenIndex = dist(gen);
+            std::string chosenOption = options[chosenIndex];
+            
+            if (chosenOption == "perturbation") {
+                frame.perturb(track);
+            }
+            else if (chosenOption == "split") {
+                frame.split();
+            }
+        }
+        
+        Sphere::logCellsToCSV("cell_log.csv", frameIndex, frameIndex, frame.cells);
+        return;
+    }
+
+    // Original optimization code for tracking mode
     std::string algorithm = "hill"; // Set default algorithm
     size_t totalIterations = frame.length() * config.simulation.iterations_per_cell;
     std::cout << "Total iterations: " << totalIterations << std::endl;
@@ -284,7 +314,7 @@ void Lineage::optimize(int frameIndex)
             if (chosenOption == "perturbation")
             {
                 // std::cout << "attempting to perturb..." << std::endl;
-                result = frame.perturb();
+                result = frame.perturb(track);
             }
             else if (chosenOption == "split")
             {
@@ -302,7 +332,6 @@ void Lineage::optimize(int frameIndex)
             // Hill climbing logic
         }
     }
-    Sphere::logCellsToCSV("cell_log.csv", frameIndex, frameIndex, frame.cells);
 }
 
 void Lineage::saveFrame(int frameIndex)
@@ -381,4 +410,4 @@ unsigned int Lineage::length()
 {
     return frames.size();
 }
-    
+

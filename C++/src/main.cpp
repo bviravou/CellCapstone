@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
 {
     // parse args here
     Args args;
+    bool trackFlag = false;
 
     args.firstFrame = std::stoi(argv[ff]);
     std::cout << "Loading args:\n";
@@ -103,18 +104,23 @@ int main(int argc, char *argv[])
               << std::flush;
     args.continueFrom = -1;
     args.track = std::stoi(argv[track]); 
+    std::cout << args.track << std::endl 
+        << std::flush;
     std::cout << "Mode: ";
     
-    if (std::tolower(args.track) == '0'){
-        // maybe bool track = false;
+    if (args.track == 0){
+        trackFlag = false;
         std::cout << "Generate Synthetic Cells Only" << std::endl 
         << std::flush;
     }
     else {
-        // maybe bool track = true;
+        trackFlag = true;
         std::cout << "Track cells" << std::endl 
         << std::flush;
     }
+
+    std::cout << "track: " << args.track << " flag: " << trackFlag << std::endl 
+        << std::flush;
 
     // load config here
     BaseConfig config;
@@ -132,30 +138,14 @@ int main(int argc, char *argv[])
 
     // Run
 
-    // if args.track == 0 then kafnckzkcnszcns
-    // if args.track == 1 then ...
-    
     auto start = std::chrono::steady_clock::now();
-
-    if (args.track == 0){
-        auto start = std::chrono::steady_clock::now();
-        std::cout << "Generate Synthetic Cells Only" << std::endl 
-        << std::flush;
-        // either pertrub or edit optimize function
+    for (int frame = 0; frame < lineage.length(); ++frame)
+    {
+        lineage.optimize(frame,trackFlag);
+        lineage.copyCellsForward(frame + 1);
+        lineage.saveFrame(frame);
+        // lineage.saveCells(frame); // TODO: Fix this
     }
-    else{
-        auto start = std::chrono::steady_clock::now();
-        for (int frame = 0; frame < lineage.length(); ++frame)
-        {
-            lineage.optimize(frame);
-            lineage.copyCellsForward(frame + 1);
-            lineage.saveFrame(frame);
-            // lineage.saveCells(frame); // TODO: Fix this
-        }
-        auto end = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end - start;
-    }
-
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
     int total_seconds = static_cast<int>(elapsed_seconds.count());

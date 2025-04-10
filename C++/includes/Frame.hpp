@@ -32,7 +32,7 @@ public:
     std::vector<cv::Mat> generateOutputSynthFrame();
     // DataFrame getCellsAsParams();
     size_t length() const;
-    CostCallbackPair perturb();
+    CostCallbackPair perturb(bool track);
     CostCallbackPair split();
     Cost gradientDescent();
     std::vector<cv::Mat> getSynthFrame();
