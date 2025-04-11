@@ -242,11 +242,6 @@ std::vector<cv::Mat> Frame::generateOutputSynthFrame()
     return outputSynthFrame;
 }
 
-
-// size_t Frame::length() const
-// {
-//     return cells.size();
-// }
 size_t Frame::length() const
 {
     return cells.size();
@@ -264,10 +259,10 @@ CostCallbackPair Frame::perturb(bool track)
     // Store old cell // no reference
     Sphere oldCell = cells[index];
 
+    // Perturb the cell
+    cells[index] = cells[index].getPerturbedCell(track);
 
-    // Perturb the cell: replace the cell at that index with a new cell
-    cells[index] = cells[index].getPerturbedCell();
-
+    // Check if the perturbed cells are valid
     bool areCellsValid = oldCell.checkIfCellsValid(cells);
     if (!areCellsValid)
     {
@@ -275,44 +270,43 @@ CostCallbackPair Frame::perturb(bool track)
         return {0.0, [](bool accept) {}};
     }
 
-    // Synthesize new synthetic image (needed for both track=0 and track=1)
-    auto newSynthFrame = generateSynthFrameFast(oldCell, cells[index]);
 
+// For synthetic mode (track=0)
     // For synthetic mode (track=0)
-    if (!track) {
-        // Always accept the perturbation and update synthetic frame
-        this->_synthFrame = newSynthFrame;
+    if (!track)
+    {
+        // Update the synthetic frame
+        this->_synthFrame = generateSynthFrame(); // Ensure the entire frame is regenerated
         return {0.0, [](bool) {}};
     }
 
-    // For tracking mode (track=1)
-    // differenitate cost value depending on track
-    if (!track){
-        return {0.0, [](bool) {}}; // return dummy values
-    }
-    else {
-        // Get the cost of the new synthetic image
-        double newCost = calculateCost(newSynthFrame);
+// For tracking mode (track=1)
 
-        // If the difference is greater than the threshold, revert to the old cell
-        double oldCost = calculateCost(_synthFrame);
-        CallBackFunc callback = [this, newSynthFrame, oldCell, index](bool accept)
+// Generate the new synthetic frame
+    auto newSynthFrame = generateSynthFrameFast(oldCell, cells[index]);
+
+// If the difference is greater than the threshold, revert to the old cell
+    double newCost = calculateCost(newSynthFrame);
+    double oldCost = calculateCost(_synthFrame);
+
+    CallBackFunc callback = [this, newSynthFrame, oldCell, index](bool accept)
+    {
+        if (accept)
         {
-            if (accept)
-            {
-                this->_synthFrame = newSynthFrame;
-            }
-            else
-            {
-                this->cells[index] = oldCell;
-            }
-        };
-        if (newCost - oldCost < 0){
-            std::cout << " New Residual Accepted: " << newCost << std::endl;
+            this->_synthFrame = newSynthFrame;
         }
-        return {newCost - oldCost, callback};
+        else
+        {
+            this->cells[index] = oldCell;
+        }
+    };
+
+    if (newCost - oldCost < 0)
+    {
+        std::cout << " New Residual Accepted: " << newCost << std::endl;
     }
 
+    return {newCost - oldCost, callback};
 }
 
 CostCallbackPair Frame::split()

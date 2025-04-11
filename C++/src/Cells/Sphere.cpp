@@ -56,7 +56,7 @@ Sphere Sphere::getPerturbedCell(bool track) const
 {
     float newRadius;
     if (!track) {
-        // Constrain radius only in synthetic mode (track=0)
+        // track = 0, to make sure radius is positive and within min/max bounds
         newRadius = std::max(cellConfig.minRadius,
                            std::min(_radius + cellConfig.radius.getPerturbOffset(track),
                                   cellConfig.maxRadius));
