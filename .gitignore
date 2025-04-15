@@ -363,3 +363,6 @@ dask-worker-space/
 
 # cell log csv
 *.csv
+
+# more input files
+input/first_100/
