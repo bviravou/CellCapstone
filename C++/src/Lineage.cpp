@@ -229,26 +229,12 @@ void Lineage::optimize(int frameIndex, bool track)
         // For synthetic cell generation, only perturb once and log to CSV
         size_t totalIterations = frame.length() * 1; // Only perturb each cell once
         std::cout << "Generating synthetic cells, iterations: " << totalIterations << std::endl;
-        
+
         for (size_t i = 0; i < totalIterations; ++i) {
-            std::vector<std::string> options = {"split", "perturbation"};
-            std::vector<double> probabilities = {config.prob.split, config.prob.perturbation};
-            
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::discrete_distribution<> dist(probabilities.begin(), probabilities.end());
-            
-            int chosenIndex = dist(gen);
-            std::string chosenOption = options[chosenIndex];
-            
-            if (chosenOption == "perturbation") {
-                frame.perturb(track);
-            }
-            else if (chosenOption == "split") {
-                frame.split();
-            }
+            // Always perform perturbation when track = 0
+            frame.perturb(track);
         }
-        
+
         Sphere::logCellsToCSV("cell_log.csv", frameIndex, frameIndex, frame.cells);
         return;
     }

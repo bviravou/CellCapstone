@@ -224,7 +224,7 @@ std::tuple<Sphere, Sphere, bool> Sphere::getSplitCells(const std::vector<cv::Mat
         {
             // return pair of (eigenval, eigenvector)
             std::vector<std::pair<double, cv::Point3d>> eigen_pair {performPCA(allPoints, subTiffSlices)};
-	    splitDir = cross product of first 2 eigenVectors above.
+	        // splitDir = cross product of first 2 eigenVectors above.
         }
         else {
             // Occurs when the simulated slice does not match up with the real slice
